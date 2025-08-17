@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Welcome - ABC Company</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="dashboard">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <h2 class="company-title">ABC Company</h2>
+      <ul class="menu">
+        <li id="make_bill"><a href="make_bill.html">Make a New Bill</a></li>
+        <li><a href="edit_bill.html">Edit a Bill</a></li>
+        <li><a href="#">Report</a></li>
+        <li><a href="deleted_bills.html">Deleted Bills</a></li>
+
+        <li><a href="#">Add Purchase</a></li>
+      </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="content">
+      <header>
+        <h1>Welcome to ABC Company</h1>
+        <button id="logoutBtn">Logout</button>
+      </header>
+      <section class="info">
+        <p>Select an option from the left menu to get started.</p>
+      </section>
+    </main>
+  </div>
+</body>
+<script>
+  // ✅ DEFINE THE BASE_URL
+  const BASE_URL = "https://billing-backend-j0ui.onrender.com";
+
+  // --- LOGOUT BUTTON ---
+  document.getElementById("logoutBtn").addEventListener("click", async () => {
+    try {
+      // ✅ ADDED BASE_URL and credentials
+      await fetch(`${BASE_URL}/api/logout`, { 
+        method: "POST", 
+        credentials: "include" 
+      });
+    } catch (err) {
+      console.error("Logout failed:", err);
+    } finally {
+      // Redirect whether logout succeeds or fails
+      window.location.href = "index.html";
+    }
+  });
+
+  // --- LOGIN CHECK ---
+  async function checkAuth() {
+    try {
+      // ✅ CORRECTED THE URL to /api/me and ADDED BASE_URL
+      const res = await fetch(`${BASE_URL}/api/me`, { 
+        credentials: "include" 
+      });
+      
+      // If response is not ok (e.g., 401 Unauthorized), redirect to login
+      if (!res.ok) {
+        window.location.href = "index.html";
+      }
+    } catch (err) {
+      // If the server can't be reached, also redirect
+      console.error("Auth check failed:", err);
+      window.location.href = "index.html";
+    }
+  }
+
+  // Run the check when the page loads
+  checkAuth();
+</script>
+</html>

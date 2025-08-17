@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>User Login</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="top-strip"></div>
+
+  <div class="wrap">
+    <div class="avatar">
+      <div class="avatar-circle">
+        <img src="assets/undraw_finance-guy-avatar_vhop.png" alt="User">
+      </div>
+    </div>
+
+    <form class="form" id="loginForm" novalidate>
+      <h1>Admin Login</h1>
+
+      <div class="input">
+        <span class="icon">📧</span>
+        <input type="email" id="email" placeholder="Email Id" required />
+      </div>
+
+      <div class="input">
+        <span class="icon">🔒</span>
+        <input type="password" id="password" placeholder="Password" required minlength="6" />
+      </div>
+
+      <button type="submit" class="btn">Login</button>
+
+
+</body>
+<script src="script.js"></script>
+</html>

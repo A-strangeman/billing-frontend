@@ -1,0 +1,1241 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Estimate Bill – ABC Company</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header>ABC Company – Estimate Bill</header>
+
+    <div class="layout">
+      <div class="left">
+        <h2>Estimated Bill</h2>
+
+        <div class="bill-header">
+          <div>
+            <label>Estimate No.</label>
+            <input type="text" id="estimateNo" placeholder="e.g. 2" />
+          </div>
+          <div>
+            <label>Date</label>
+            <input type="date" id="billDate" />
+          </div>
+          <div>
+            <label>Customer Name</label>
+            <input
+              type="text"
+              id="customerName"
+              placeholder="Enter customer name"
+            />
+          </div>
+          <div>
+            <label>Phone</label>
+            <input
+              type="text"
+              id="customerPhone"
+              placeholder="Customer phone (optional)"
+            />
+          </div>
+        </div>
+
+        <table id="billTable">
+          <thead>
+            <tr>
+              <th>S.No</th>
+              <th>Product Name</th>
+              <th>Qty</th>
+              <th>Unit</th>
+              <th>Unit Price</th>
+              <th>Amount (Rs)</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+
+        <div class="actions">
+          <button id="addRowBtn">+ Add Row</button>
+          <button class="secondary" id="downloadBtn">Download PDF</button>
+        </div>
+
+        <div class="totals">
+          <div>
+            <label>Discount (Rs)</label>
+            <input type="number" id="discount" value="0" min="0" step="0.01" />
+          </div>
+          <div>
+            <label>Sub Total (Rs)</label>
+            <input type="text" id="subTotal" readonly />
+          </div>
+          <div>
+            <label>Grand Total (Rs)</label>
+            <input type="text" id="grandTotal" readonly />
+          </div>
+          <div>
+            <label>Received (Rs)</label>
+            <input type="number" id="received" value="0" min="0" step="0.01" />
+          </div>
+          <div>
+            <label>Balance (Rs)</label>
+            <input type="text" id="balance" readonly />
+          </div>
+        </div>
+
+        <div class="amount-words">
+          <label>Amount in Words</label>
+          <textarea id="amountWords" readonly></textarea>
+        </div>
+      </div>
+
+      <div class="right">
+        <div class="note">
+          Click a row on the left to select it. Your selections below will
+          autofill into that row’s Product Name.
+        </div>
+
+        <div class="section-title">Category</div>
+        <div class="chip-row" id="catRow">
+          <span class="chip" data-cat="Plumbing">Plumbing</span>
+          <span class="chip" data-cat="Wiring">Wiring</span>
+          <span class="chip" data-cat="TMT">TMT</span>
+          <span class="chip" data-cat="Cement">Cement</span>
+          <span class="chip" data-cat="Paint">Paint</span>
+          <span class="chip" data-cat="Tin">Tin</span>
+          <span class="chip" data-cat="Ply">Ply</span>
+          <span class="chip" data-cat="Tile">Tile</span>
+          <span class="chip" data-cat="Pipe">Pipe</span>
+          <span class="chip" data-cat="Door">Door</span>
+        </div>
+
+        <div id="materialBlockTMT" style="display: none">
+          <div class="section-title">Material</div>
+          <div class="chip-row" id="materialRowTMT">
+            <span class="chip" data-mat="4mm TMT">4mm TMT</span>
+            <span class="chip" data-mat="7mm TMT">7mm TMT</span>
+            <span class="chip" data-mat="8mm TMT">8mm TMT</span>
+            <span class="chip" data-mat="10mm TMT">10mm TMT</span>
+            <span class="chip" data-mat="12mm TMT">12mm TMT</span>
+            <span class="chip" data-mat="16mm TMT">16mm TMT</span>
+            <span class="chip" data-mat="Cutting Blade">Cutting Blade</span>
+            <span class="chip" data-mat="22-Guage Tar">22-Guage Wire</span>
+            <span class="chip" data-mat="7X7 Ring">7X7 Ring</span>
+            <span class="chip" data-mat="7X4 Ring">7X4 Ring</span>
+            <span class="chip" data-mat="3X3 Ring">3X3 Ring</span>
+            <span class="chip" data-mat="Kalampu">Kalampu</span>
+          </div>
+          </div>
+
+        <div id="materialBlockCEMENT" style="display: none">
+          <div class="section-title">Material</div>
+          <div class="chip-row" id="materialRowCEMENT">
+            <span class="chip" data-mat="43 maruti Cement OPC">43 maruti cement OPC</span>
+            <span class="chip" data-mat="maruti Cement PPC">maruti cement PPC</span>
+            <span class="chip" data-mat="53 maruti Cement OPC">53 maruti cement OPC</span>
+            <span class="chip" data-mat="Cement OPC">cement OPC</span>
+            <span class="chip" data-mat="Cement PPC">cement PPC</span>
+            <span class="chip" data-mat="Dr.fixit 20L">Dr.fixit 20L</span>
+            <span class="chip" data-mat="Dr.fixit 10L">Dr.fixit 10L</span>
+            <span class="chip" data-mat="Dr.fixit 5L">Dr.fixit 5L</span>
+            <span class="chip" data-mat="Dr.fixit 1L">Dr.fixit 1L</span>    
+          </div>
+          </div>
+
+        <div id="materialBlockDOOR" style="display: none">
+          <div class="section-title">Material</div>
+          <div class="chip-row" id="materialRowDOOR">
+            <span class="chip" data-mat="25 Digital">25 Digital</span>
+            <span class="chip" data-mat="32 Digital">32 Digital</span>
+            <span class="chip" data-mat="25 PVC">25 PVC</span>
+            <span class="chip" data-mat="32 PVC">32 PVC</span>  
+          </div>
+          </div>
+        
+        <div id="sizeBlock25 Digital" style="display: none">
+          <div class="section-title">Size</div>
+          <div class="chip-row" id="sizeRow25 Digital">
+            <span class="chip" data-size='80X32'>80X32</span>
+            <span class="chip" data-size='80X34'>80X34</span>
+            <span class="chip" data-size='80X36'>80X36</span>
+            <span class="chip" data-size='80X38'>80X38</span>
+            <span class="chip" data-size='80X42'>80X42</span>
+            <span class="chip" data-size='80X44'>80X44</span>
+            <span class="chip" data-size='78X32'>78X32</span>
+            <span class="chip" data-size='76X32'>76X32</span>
+            <span class="chip" data-size='74X32'>74X32</span>
+            <span class="chip" data-size='72X32'>72X32</span> 
+          </div>
+        </div>
+
+        <div id="sizeBlock32 Digital" style="display: none">
+          <div class="section-title">Size</div>
+          <div class="chip-row" id="sizeRow32 Digital">
+            <span class="chip" data-size='80X32'>80X32</span>
+            <span class="chip" data-size='80X34'>80X34</span>
+            <span class="chip" data-size='80X36'>80X36</span>
+            <span class="chip" data-size='80X38'>80X38</span>
+            <span class="chip" data-size='80X42'>80X42</span>
+            <span class="chip" data-size='80X44'>80X44</span>
+            <span class="chip" data-size='78X32'>78X32</span>
+            <span class="chip" data-size='76X32'>76X32</span>
+            <span class="chip" data-size='74X32'>74X32</span>
+            <span class="chip" data-size='72X32'>72X32</span> 
+          </div>
+        </div>
+
+        <div id="sizeBlock25 PVC" style="display: none">
+          <div class="section-title">Size</div>
+          <div class="chip-row" id="sizeRow25 PVC">
+            <span class="chip" data-size='80X32'>80X32</span>
+            <span class="chip" data-size='80X34'>80X34</span>
+            <span class="chip" data-size='80X36'>80X36</span>
+            <span class="chip" data-size='80X38'>80X38</span>
+            <span class="chip" data-size='80X42'>80X42</span>
+            <span class="chip" data-size='80X44'>80X44</span>
+            <span class="chip" data-size='78X32'>78X32</span>
+            <span class="chip" data-size='76X32'>76X32</span>
+            <span class="chip" data-size='74X32'>74X32</span>
+            <span class="chip" data-size='72X32'>72X32</span> 
+          </div>
+        </div>
+
+        <div id="sizeBlock32 PVC" style="display: none">
+          <div class="section-title">Size</div>
+          <div class="chip-row" id="sizeRow32 PVC">
+            <span class="chip" data-size='80X32'>80X32</span>
+            <span class="chip" data-size='80X34'>80X34</span>
+            <span class="chip" data-size='80X36'>80X36</span>
+            <span class="chip" data-size='80X38'>80X38</span>
+            <span class="chip" data-size='80X42'>80X42</span>
+            <span class="chip" data-size='80X44'>80X44</span>
+            <span class="chip" data-size='78X32'>78X32</span>
+            <span class="chip" data-size='76X32'>76X32</span>
+            <span class="chip" data-size='74X32'>74X32</span>
+            <span class="chip" data-size='72X32'>72X32</span> 
+          </div>
+        </div>
+
+        <div id="materialBlockTILE" style="display: none">
+          <div class="section-title">Thickness</div>
+          <div class="chip-row" id="materialRowTILE">
+            <span class="chip" data-mat="12X12 Tile">12X12 Tile</span>
+            <span class="chip" data-mat="12X18 Tile">12X18 Tile</span>
+            <span class="chip" data-mat="24X24 Tile">24X24 Tile</span>
+            <span class="chip" data-mat="Sckating Tile">Sckating Tile</span>
+            <span class="chip" data-mat="Groot">Groot</span>
+          </div>
+          </div>
+
+        <div id="materialBlockPIPE" style="display: none">
+          <div class="section-title">Thickness</div>
+          <div class="chip-row" id="materialRowPIPE">
+             <span class="chip" data-mat="20mm NS White">20mm NS White</span>
+             <span class="chip" data-mat="16mm NS White">16mm NS White</span>
+             <span class="chip" data-mat="20mm NS Black">20mm NS Black</span>
+             <span class="chip" data-mat="16mm NS Black">16mm NS Black</span>
+             <span class="chip" data-mat="20mm Black">20mm Black</span>
+             <span class="chip" data-mat="16mm Black">16mm Black</span>
+             <span class="chip" data-mat="Point-box">Point-box</span>
+             <span class="chip" data-mat="Tape">Tape</span>
+          </div>
+          </div>
+
+        <div id="materialBlockPLY" style="display: none">
+          <div class="section-title">Thickness</div>
+          <div class="chip-row" id="materialRowPLY">
+            <span class="chip" data-mat="18mm">18mm</span>
+            <span class="chip" data-mat="12mm">12mm</span>
+            <span class="chip" data-mat="10mm">10mm</span>
+            <span class="chip" data-mat="6mm">6mm</span>
+            <span class="chip" data-mat="Fevicol">Fevicol</span>
+            <span class="chip" data-mat="pin killa">pin Killa</span>
+            <span class="chip" data-mat="Heatex">Heatex</span>
+            <span class="chip" data-mat="Formica">Formica</span>
+            <span class="chip" data-mat="Beet">Beet</span>   
+            <span class="chip" data-mat="Chalk Powder">Chalk Powder</span>   
+            <span class="chip" data-mat="Brown Powder">Brown Powder</span>   
+            <span class="chip" data-mat="Varnish">Varnish</span>   
+          </div>
+          </div>
+        
+        <div id="sizeBlock18mm" style="display: none">
+          <div class="section-title">Size</div>
+          <div class="chip-row" id="sizeRow18mm">
+            <span class="chip" data-size='(8X4)'>(8X4)</span>
+            <span class="chip" data-size='(7X4)'>(7X4)</span>
+            <span class="chip" data-size='(6X4)'>(6X4)</span>
+            <span class="chip" data-size='(5X4)'>(5X4)</span>
+            <span class="chip" data-size='(8X3)'>(8X3)</span>
+            <span class="chip" data-size='(7X3)'>(7X3)</span>
+            <span class="chip" data-size='(6X3)'>(6X3)</span>
+            <span class="chip" data-size='(5X3)'>(5X3)</span>
+          </div>
+        </div>
+
+        <div id="sizeBlock12mm" style="display: none">
+          <div class="section-title">Size</div>
+          <div class="chip-row" id="sizeRow12mm">
+            <span class="chip" data-size='(8X4)'>(8X4)</span>
+            <span class="chip" data-size='(7X4)'>(7X4)</span>
+            <span class="chip" data-size='(6X4)'>(6X4)</span>
+            <span class="chip" data-size='(5X4)'>(5X4)</span>
+            <span class="chip" data-size='(8X3)'>(8X3)</span>
+            <span class="chip" data-size='(7X3)'>(7X3)</span>
+            <span class="chip" data-size='(6X3)'>(6X3)</span>
+            <span class="chip" data-size='(5X3)'>(5X3)</span> 
+          </div>
+        </div>
+
+        <div id="sizeBlock10mm" style="display: none">
+          <div class="section-title">Size</div>
+          <div class="chip-row" id="sizeRow10mm">
+            <span class="chip" data-size='(8X4)'>(8X4)</span>
+            <span class="chip" data-size='(7X4)'>(7X4)</span>
+            <span class="chip" data-size='(6X4)'>(6X4)</span>
+            <span class="chip" data-size='(5X4)'>(5X4)</span>
+            <span class="chip" data-size='(8X3)'>(8X3)</span>
+            <span class="chip" data-size='(7X3)'>(7X3)</span>
+            <span class="chip" data-size='(6X3)'>(6X3)</span>
+            <span class="chip" data-size='(5X3)'>(5X3)</span> 
+          </div>
+        </div>
+
+        <div id="sizeBlock6mm" style="display: none">
+          <div class="section-title">Size</div>
+          <div class="chip-row" id="sizeRow6mm">
+            <span class="chip" data-size='(8X4)'>(8X4)</span>
+            <span class="chip" data-size='(7X4)'>(7X4)</span>
+            <span class="chip" data-size='(6X4)'>(6X4)</span>
+            <span class="chip" data-size='(5X4)'>(5X4)</span>
+            <span class="chip" data-size='(8X3)'>(8X3)</span>
+            <span class="chip" data-size='(7X3)'>(7X3)</span>
+            <span class="chip" data-size='(6X3)'>(6X3)</span>
+            <span class="chip" data-size='(5X3)'>(5X3)</span>
+          </div>
+        </div>
+
+        <div id="sizeBlockFevicol" style="display: none">
+          <div class="section-title">Size</div>
+          <div class="chip-row" id="sizeRowFevicol">
+            <span class="chip" data-size='1/2'>1/2</span>
+            <span class="chip" data-size='1'>1</span>
+           
+            
+          </div>
+        </div>
+
+        <div id="sizeBlockHeatex" style="display: none">
+          <div class="section-title">Size</div>
+          <div class="chip-row" id="sizeRowHeatex">
+            <span class="chip" data-size='1/2'>1/2</span>
+            <span class="chip" data-size='1'>1</span>
+            <span class="chip" data-size='2'>2</span>
+            <span class="chip" data-size='5'>5</span>
+          </div>
+        </div>
+
+        <div id="sizeBlockBeet" style="display: none">
+          <div class="section-title">Quality</div>
+          <div class="chip-row" id="sizeRowBeet">
+            <span class="chip" data-size='Wood'>Wood</span>
+            <span class="chip" data-size='Plastic'>Plastic</span> 
+          </div>
+        </div>
+
+        <div id="fittingBlock18mm" style="display: none">
+          <div class="section-title">No of Ply</div>
+          <div class="chip-row" id="fittingRow18mm">
+            <span class="chip" data-fit="1">1</span>
+            <span class="chip" data-fit="2">2</span>
+            <span class="chip" data-fit="3">3</span>
+            <span class="chip" data-fit="4">4</span>
+            <span class="chip" data-fit="5">5</span>
+            <span class="chip" data-fit="6">6</span>
+            <span class="chip" data-fit="7">7</span>
+            <span class="chip" data-fit="8">8</span>
+            <span class="chip" data-fit="9">9</span>
+            <span class="chip" data-fit="10">10</span>
+            <span class="chip" data-fit="11">11</span>
+            <span class="chip" data-fit="12">12</span>
+            <span class="chip" data-fit="13">13</span>
+            <span class="chip" data-fit="14">14</span>
+            <span class="chip" data-fit="15">15</span>
+            <span class="chip" data-fit="16">16</span>
+            <span class="chip" data-fit="17">17</span>
+            <span class="chip" data-fit="18">18</span>
+            <span class="chip" data-fit="19">19</span>
+            <span class="chip" data-fit="20">20</span>
+            <span class="chip" data-fit="21">21</span>
+            <span class="chip" data-fit="22">22</span>
+            <span class="chip" data-fit="23">23</span>
+            <span class="chip" data-fit="24">24</span>
+            <span class="chip" data-fit="25">25</span>
+            <span class="chip" data-fit="26">26</span>
+            <span class="chip" data-fit="27">27</span>
+            <span class="chip" data-fit="28">28</span>
+            <span class="chip" data-fit="29">29</span>
+            <span class="chip" data-fit="30">30</span>
+            <span class="chip" data-fit="31">31</span>
+            <span class="chip" data-fit="32">32</span>
+            <span class="chip" data-fit="33">33</span>
+            <span class="chip" data-fit="34">34</span>
+            <span class="chip" data-fit="35">35</span>
+            <span class="chip" data-fit="36">36</span>
+            <span class="chip" data-fit="37">37</span>
+            <span class="chip" data-fit="38">38</span>
+            <span class="chip" data-fit="39">39</span>
+            <span class="chip" data-fit="40">40</span>
+          </div>
+        </div>
+        <div id="fittingBlock12mm" style="display: none">
+          <div class="section-title">No of Ply</div>
+          <div class="chip-row" id="fittingRow12mm">
+            <span class="chip" data-fit="1">1</span>
+            <span class="chip" data-fit="2">2</span>
+            <span class="chip" data-fit="3">3</span>
+            <span class="chip" data-fit="4">4</span>
+            <span class="chip" data-fit="5">5</span>
+            <span class="chip" data-fit="6">6</span>
+            <span class="chip" data-fit="7">7</span>
+            <span class="chip" data-fit="8">8</span>
+            <span class="chip" data-fit="9">9</span>
+            <span class="chip" data-fit="10">10</span>
+            <span class="chip" data-fit="11">11</span>
+            <span class="chip" data-fit="12">12</span>
+            <span class="chip" data-fit="13">13</span>
+            <span class="chip" data-fit="14">14</span>
+            <span class="chip" data-fit="15">15</span>
+            <span class="chip" data-fit="16">16</span>
+            <span class="chip" data-fit="17">17</span>
+            <span class="chip" data-fit="18">18</span>
+            <span class="chip" data-fit="19">19</span>
+            <span class="chip" data-fit="20">20</span>
+            <span class="chip" data-fit="21">21</span>
+            <span class="chip" data-fit="22">22</span>
+            <span class="chip" data-fit="23">23</span>
+            <span class="chip" data-fit="24">24</span>
+            <span class="chip" data-fit="25">25</span>
+            <span class="chip" data-fit="26">26</span>
+            <span class="chip" data-fit="27">27</span>
+            <span class="chip" data-fit="28">28</span>
+            <span class="chip" data-fit="29">29</span>
+            <span class="chip" data-fit="30">30</span>
+            <span class="chip" data-fit="31">31</span>
+            <span class="chip" data-fit="32">32</span>
+            <span class="chip" data-fit="33">33</span>
+            <span class="chip" data-fit="34">34</span>
+            <span class="chip" data-fit="35">35</span>
+            <span class="chip" data-fit="36">36</span>
+            <span class="chip" data-fit="37">37</span>
+            <span class="chip" data-fit="38">38</span>
+            <span class="chip" data-fit="39">39</span>
+            <span class="chip" data-fit="40">40</span>
+          </div>
+        </div>
+        <div id="fittingBlock10mm" style="display: none">
+          <div class="section-title">No of Ply</div>
+          <div class="chip-row" id="fittingRow10mm">
+            <span class="chip" data-fit="1">1</span>
+            <span class="chip" data-fit="2">2</span>
+            <span class="chip" data-fit="3">3</span>
+            <span class="chip" data-fit="4">4</span>
+            <span class="chip" data-fit="5">5</span>
+            <span class="chip" data-fit="6">6</span>
+            <span class="chip" data-fit="7">7</span>
+            <span class="chip" data-fit="8">8</span>
+            <span class="chip" data-fit="9">9</span>
+            <span class="chip" data-fit="10">10</span>
+            <span class="chip" data-fit="11">11</span>
+            <span class="chip" data-fit="12">12</span>
+            <span class="chip" data-fit="13">13</span>
+            <span class="chip" data-fit="14">14</span>
+            <span class="chip" data-fit="15">15</span>
+            <span class="chip" data-fit="16">16</span>
+            <span class="chip" data-fit="17">17</span>
+            <span class="chip" data-fit="18">18</span>
+            <span class="chip" data-fit="19">19</span>
+            <span class="chip" data-fit="20">20</span>
+            <span class="chip" data-fit="21">21</span>
+            <span class="chip" data-fit="22">22</span>
+            <span class="chip" data-fit="23">23</span>
+            <span class="chip" data-fit="24">24</span>
+            <span class="chip" data-fit="25">25</span>
+            <span class="chip" data-fit="26">26</span>
+            <span class="chip" data-fit="27">27</span>
+            <span class="chip" data-fit="28">28</span>
+            <span class="chip" data-fit="29">29</span>
+            <span class="chip" data-fit="30">30</span>
+            <span class="chip" data-fit="31">31</span>
+            <span class="chip" data-fit="32">32</span>
+            <span class="chip" data-fit="33">33</span>
+            <span class="chip" data-fit="34">34</span>
+            <span class="chip" data-fit="35">35</span>
+            <span class="chip" data-fit="36">36</span>
+            <span class="chip" data-fit="37">37</span>
+            <span class="chip" data-fit="38">38</span>
+            <span class="chip" data-fit="39">39</span>
+            <span class="chip" data-fit="40">40</span>
+          </div>
+        </div>
+        <div id="fittingBlock6mm" style="display: none">
+          <div class="section-title">No of Ply</div>
+          <div class="chip-row" id="fittingRow6mm">
+            <span class="chip" data-fit="1">1</span>
+            <span class="chip" data-fit="2">2</span>
+            <span class="chip" data-fit="3">3</span>
+            <span class="chip" data-fit="4">4</span>
+            <span class="chip" data-fit="5">5</span>
+            <span class="chip" data-fit="6">6</span>
+            <span class="chip" data-fit="7">7</span>
+            <span class="chip" data-fit="8">8</span>
+            <span class="chip" data-fit="9">9</span>
+            <span class="chip" data-fit="10">10</span>
+            <span class="chip" data-fit="11">11</span>
+            <span class="chip" data-fit="12">12</span>
+            <span class="chip" data-fit="13">13</span>
+            <span class="chip" data-fit="14">14</span>
+            <span class="chip" data-fit="15">15</span>
+            <span class="chip" data-fit="16">16</span>
+            <span class="chip" data-fit="17">17</span>
+            <span class="chip" data-fit="18">18</span>
+            <span class="chip" data-fit="19">19</span>
+            <span class="chip" data-fit="20">20</span>
+            <span class="chip" data-fit="21">21</span>
+            <span class="chip" data-fit="22">22</span>
+            <span class="chip" data-fit="23">23</span>
+            <span class="chip" data-fit="24">24</span>
+            <span class="chip" data-fit="25">25</span>
+            <span class="chip" data-fit="26">26</span>
+            <span class="chip" data-fit="27">27</span>
+            <span class="chip" data-fit="28">28</span>
+            <span class="chip" data-fit="29">29</span>
+            <span class="chip" data-fit="30">30</span>
+            <span class="chip" data-fit="31">31</span>
+            <span class="chip" data-fit="32">32</span>
+            <span class="chip" data-fit="33">33</span>
+            <span class="chip" data-fit="34">34</span>
+            <span class="chip" data-fit="35">35</span>
+            <span class="chip" data-fit="36">36</span>
+            <span class="chip" data-fit="37">37</span>
+            <span class="chip" data-fit="38">38</span>
+            <span class="chip" data-fit="39">39</span>
+            <span class="chip" data-fit="40">40</span>
+          </div>
+        </div>
+
+        <div id="fittingBlockBeet" style="display: none">
+          <div class="section-title">Beet Type</div>
+          <div class="chip-row" id="fittingRowBet">
+            <span class="chip" data-fit="Mandir">Mandir</span>
+            <span class="chip" data-fit="Channel">Channel</span>
+            <span class="chip" data-fit="L">L</span>
+
+          </div>
+        </div>
+
+
+
+
+        <div id="materialBlockTIN" style="display: none">
+          <div class="section-title">Material</div>
+          <div class="chip-row" id="materialRowTIN">
+            <span class="chip" data-mat="Aarti Color">Aarti Color</span>
+            <span class="chip" data-mat="Aarti White">Aarti White</span>
+            <span class="chip" data-mat="Tin">Tin</span>
+            <span class="chip" data-mat="3ft Plain Sheet Color">3ft Plain Sheet Color</span>
+            <span class="chip" data-mat="4ft Plain Sheet Color">4ft Plain Sheet Color</span>
+            <span class="chip" data-mat="3ft Plain Sheet Tin">3ft Plain Sheet Tin</span>
+            <span class="chip" data-mat="3ft Plain Sheet Aluminium">3ft Plain Sheet Aluminium</span>
+            <span class="chip" data-mat="2.5ft Plain Sheet Aluminium">2.5ft Plain Sheet Aluminium</span>
+            <span class="chip" data-mat="Hilti Screw">Hilti Screw</span>
+            <span class="chip" data-mat="Maigra">Maigra</span>
+            <span class="chip" data-mat="Nails">Nails</span>
+            <span class="chip" data-mat="Tin Killa">Tin Killa</span>
+            <span class="chip" data-mat="Pat-tar">pattar</span>
+            <span class="chip" data-mat="Nut-bolt">Nut-bolt</span>   
+          </div>
+          </div>
+        
+        <div id="sizeBlockAarti Color" style="display: none">
+          <div class="section-title">Size</div>
+          <div class="chip-row" id="sizeRowAarti Color">
+            <span class="chip" data-size='36mm'>36mm</span>
+            <span class="chip" data-size='30mm'>30mm</span>
+            <span class="chip" data-size='24mm'>24mm</span>
+            <span class="chip" data-size='19mm'>19mm</span>
+            <span class="chip" data-size='42mm'>42mm</span> 
+          </div>
+        </div>
+
+        <div id="sizeBlockMaigra" style="display: none">
+          <div class="section-title">Size</div>
+          <div class="chip-row" id="sizeRowMaigra">
+            <span class="chip" data-size='Color 6Ft' >Color 6Ft</span>
+            <span class="chip" data-size='Color 8Ft' >Color 8Ft</span>
+            <span class="chip" data-size='White 6Ft' >White 6Ft</span>
+            <span class="chip" data-size='White 8Ft' >White 8Ft</span>
+          </div>
+        </div>
+
+        <div id="sizeBlockNails" style="display: none">
+          <div class="section-title">Size</div>
+          <div class="chip-row" id="sizeRowNails">
+            <span class="chip" data-size='1"'>1"</span>
+            <span class="chip" data-size='1.5"'>1.5"</span>
+            <span class="chip" data-size='2"'>2"</span>
+            <span class="chip" data-size='2.5"'>2.5"</span>
+            <span class="chip" data-size='3"'>3"</span> 
+            <span class="chip" data-size='4"'>4"</span> 
+            <span class="chip" data-size='5"'>5"</span> 
+          </div>
+        </div>
+
+        <div id="sizeBlockAarti White" style="display: none">
+          <div class="section-title">Size</div>
+          <div class="chip-row" id="sizeRowAarti White">
+            <span class="chip" data-size='42mm'>42mm</span>
+            <span class="chip" data-size='39mm'>39mm</span>
+            <span class="chip" data-size='36mm'>36mm</span>
+            <span class="chip" data-size='32mm'>32mm</span>
+            <span class="chip" data-size='30mm'>30mm</span>
+            <span class="chip" data-size='26mm'>26mm</span>
+            <span class="chip" data-size='24mm'>24mm</span>
+            <span class="chip" data-size='19mm'>19mm</span>
+            <span class="chip" data-size='13mm'>13mm</span>  
+          </div>
+        </div>
+
+        <div id="sizeBlockHilti Screw" style="display: none">
+          <div class="section-title">Size</div>
+          <div class="chip-row" id="sizeRowHilti Screw">
+            <span class="chip" data-size='19mm'>19mm</span>
+            <span class="chip" data-size='25mm'>25mm</span>
+            <span class="chip" data-size='35mm'>35mm</span>
+            <span class="chip" data-size='45mm'>45mm</span>  
+          </div>
+        </div>
+
+        <div id="fittingBlockAarti Color" style="display: none">
+          <div class="section-title">Tin Size</div>
+          <div class="chip-row" id="fittingRowAarti Color">
+            <span class="chip" data-fit="6Ft">6Ft</span>
+            <span class="chip" data-fit="7Ft">7Ft</span>
+            <span class="chip" data-fit="8Ft">8Ft</span>
+            <span class="chip" data-fit="9Ft">9Ft</span>
+            <span class="chip" data-fit="10Ft">10Ft</span>
+            <span class="chip" data-fit="12Ft">12Ft</span>
+          </div>
+        </div>
+
+        <div id="fittingBlockAarti White" style="display: none">
+          <div class="section-title">Tin Size</div>
+          <div class="chip-row" id="fittingRowAarti White">
+            <span class="chip" data-fit="6Ft">6Ft</span>
+            <span class="chip" data-fit="7Ft">7Ft</span>
+            <span class="chip" data-fit="8Ft">8Ft</span>
+            <span class="chip" data-fit="9Ft">9Ft</span>
+            <span class="chip" data-fit="10Ft">10Ft</span>
+            <span class="chip" data-fit="12Ft">12Ft</span>
+          </div>
+        </div>
+
+
+
+        <div id="materialBlockPAINT" style="display: none">
+          <div class="section-title">Material</div>
+          <div class="chip-row" id="materialRowPAINT">
+            <span class="chip" data-mat="Jenosolin">Jenosolin</span>
+            <span class="chip" data-mat="BP Exterior">BP Exterior</span>
+            <span class="chip" data-mat="BP Interior">BP Interior</span>
+            <span class="chip" data-mat="Exterior A-Guard Primer">Exterior A-Guard Primer</span>
+            <span class="chip" data-mat="All Guard">All Guard</span>
+            <span class="chip" data-mat="Walmasta ">Walmasta</span>
+            <span class="chip" data-mat="Silk">Silk</span>
+            <span class="chip" data-mat="Easy Clean">Easy Clean</span>
+            <span class="chip" data-mat="Bison">Bison</span>
+            <span class="chip" data-mat="Berger Gold">Berger Gold</span>
+            <span class="chip" data-mat="Brolac">Brolac</span>
+            <span class="chip" data-mat="Umbrella">Umbrella</span>
+            <span class="chip" data-mat="Enamel">Enamel</span>
+            <span class="chip" data-mat="Metal Primer">Metal Primer</span>
+            <span class="chip" data-mat="Wood Primer">Wood Primer</span>
+            <span class="chip" data-mat="Brush">Brush</span>
+            <span class="chip" data-mat="Roller">Roller</span>
+            <span class="chip" data-mat="Tarpin Oil">Tarpin Oil</span>
+            <span class="chip" data-mat="Spray">Spray</span>
+            <span class="chip" data-mat="Tube">Tube</span>
+            <span class="chip" data-mat="Colourent">Colourent</span>
+            <span class="chip" data-mat="Putty">Putty</span>
+            <span class="chip" data-mat="Masking Tape">Masking Tape</span>
+          </div>
+        </div>
+
+        <div id="sizeBlockPutty" style="display: none">
+          <div class="section-title">Size</div>
+          <div class="chip-row" id="sizeRowPutty">
+            <span class="chip" data-size='Interior'>Interior</span>
+            <span class="chip" data-size='Exterior'>Exterior</span>
+            <span class="chip" data-size='Blade 8"'>Blade 8"</span>
+            <span class="chip" data-size='Blade 4"'>Blade 4"</span>
+            <span class="chip" data-size='Blade'>Blade</span>
+          </div>
+        </div>
+
+        <div id="sizeBlockJenosolin" style="display: none">
+          <div class="section-title">Size</div>
+          <div class="chip-row" id="sizeRowJenosolin">
+            <span class="chip" data-size='20L'>20L</span>
+            <span class="chip" data-size='10L'>10L</span>
+            <span class="chip" data-size='4L'>4L</span>
+            <span class="chip" data-size='1L'>1L</span>
+          </div>
+        </div>
+
+        <div id="sizeBlockBP Exterior" style="display: none">
+          <div class="section-title">Size</div>
+          <div class="chip-row" id="sizeRowBP Exterior">
+            <span class="chip" data-size='20L'>20L</span>
+            <span class="chip" data-size='10L'>10L</span>
+            <span class="chip" data-size='4L'>4L</span>
+            <span class="chip" data-size='1L'>1L</span>
+          </div>
+        </div>
+        
+        <div id="sizeBlockBP Interior" style="display: none">
+          <div class="section-title">Size</div>
+          <div class="chip-row" id="sizeRowBP Interior">
+            <span class="chip" data-size='20L'>20L</span>
+            <span class="chip" data-size='10L'>10L</span>
+            <span class="chip" data-size='4L'>4L</span>
+            <span class="chip" data-size='1L'>1L</span>
+          </div>
+        </div>
+
+        <div id="sizeBlockExterior A-Guard Primer" style="display: none">
+          <div class="section-title">Size</div>
+          <div class="chip-row" id="sizeRowExterior A-Guard Primer">
+            <span class="chip" data-size='20L'>20L</span>
+            <span class="chip" data-size='10L'>10L</span>
+            <span class="chip" data-size='4L'>4L</span>
+            <span class="chip" data-size='1L'>1L</span>
+          </div>
+        </div>
+        <div id="sizeBlockAll Guard" style="display: none">
+          <div class="section-title">Size</div>
+          <div class="chip-row" id="sizeRowAll Guard">
+            <span class="chip" data-size='20L'>20L</span>
+            <span class="chip" data-size='10L'>10L</span>
+            <span class="chip" data-size='4L'>4L</span>
+            <span class="chip" data-size='1L'>1L</span>
+          </div>
+        </div>
+        <div id="sizeBlockWalmasta" style="display: none">
+          <div class="section-title">Size</div>
+          <div class="chip-row" id="sizeRowWalmasta">
+            <span class="chip" data-size='20L'>20L</span>
+            <span class="chip" data-size='10L'>10L</span>
+            <span class="chip" data-size='4L'>4L</span>
+            <span class="chip" data-size='1L'>1L</span>
+          </div>
+        </div>
+
+        <div id="sizeBlockEasy Clean" style="display: none">
+          <div class="section-title">Size</div>
+          <div class="chip-row" id="sizeRowEasy Clean">
+            <span class="chip" data-size='20L'>20L</span>
+            <span class="chip" data-size='10L'>10L</span>
+            <span class="chip" data-size='4L'>4L</span>
+            <span class="chip" data-size='1L'>1L</span>
+          </div>
+        </div>
+
+        <div id="sizeBlockSilk" style="display: none">
+          <div class="section-title">Size</div>
+          <div class="chip-row" id="sizeRowSilk">
+            <span class="chip" data-size='20L'>20L</span>
+            <span class="chip" data-size='10L'>10L</span>
+            <span class="chip" data-size='4L'>4L</span>
+            <span class="chip" data-size='1L'>1L</span>
+          </div>
+        </div>
+
+        <div id="sizeBlockBison" style="display: none">
+          <div class="section-title">Size</div>
+          <div class="chip-row" id="sizeRowBison">
+            <span class="chip" data-size='20L'>20L</span>
+            <span class="chip" data-size='10L'>10L</span>
+            <span class="chip" data-size='4L'>4L</span>
+            <span class="chip" data-size='1L'>1L</span>
+          </div>
+        </div>
+
+        <div id="sizeBlockBrolac" style="display: none">
+          <div class="section-title">Size</div>
+          <div class="chip-row" id="sizeRowBrolac">
+            <span class="chip" data-size='4L'>4L</span>
+            <span class="chip" data-size='1L'>1L</span>
+            <span class="chip" data-size='1/2L'>1/2L</span>
+          </div>
+        </div>
+
+        <div id="sizeBlockUmbrella" style="display: none">
+          <div class="section-title">Size</div>
+          <div class="chip-row" id="sizeRowUmbrella">
+            <span class="chip" data-size='4L'>4L</span>
+            <span class="chip" data-size='1L'>1L</span>
+            <span class="chip" data-size='1/2L'>1/2L</span>
+          </div>
+        </div>
+
+        <div id="sizeBlockEnamel" style="display: none">
+          <div class="section-title">Size</div>
+          <div class="chip-row" id="sizeRowEnamel">
+            <span class="chip" data-size='4L'>4L</span>
+            <span class="chip" data-size='1L'>1L</span>
+            <span class="chip" data-size='1/2L'>1/2L</span>
+          </div>
+        </div>
+        <div id="sizeBlockBerger Gold" style="display: none">
+          <div class="section-title">Size</div>
+          <div class="chip-row" id="sizeRowBerger-Gold">
+            <span class="chip" data-size='1L'>1L</span>
+            <span class="chip" data-size='1/2L'>1/2L</span>
+          </div>
+          
+        </div>
+        <div id="sizeBlockMetal Primer" style="display: none">
+          <div class="section-title">Size</div>
+          <div class="chip-row" id="sizeRowMetal Primer">
+            <span class="chip" data-size='4L'>4L</span>
+            <span class="chip" data-size='1L'>1L</span>
+            <span class="chip" data-size='1/2L'>1/2L</span>
+          </div>
+        </div>
+
+        <div id="sizeBlockWood Primer" style="display: none">
+          <div class="section-title">Size</div>
+          <div class="chip-row" id="sizeRowWood Primer">
+            <span class="chip" data-size='4L'>4L</span>
+            <span class="chip" data-size='1L'>1L</span>
+            <span class="chip" data-size='1/2L'>1/2L</span>
+          </div>
+        </div>
+
+        <div id="sizeBlockBrush" style="display: none">
+          <div class="section-title">Size</div>
+          <div class="chip-row" id="sizeRowBrush">
+            <span class="chip" data-size='5"'>5"</span>
+            <span class="chip" data-size='4"'>4"</span>
+            <span class="chip" data-size='3"'>3"</span>
+            <span class="chip" data-size='2.5"'>2.5"</span>
+            <span class="chip" data-size='2"'>2"</span>
+            <span class="chip" data-size='1.5"'>1.5"</span>
+            <span class="chip" data-size='1"'>1"</span>
+            <span class="chip" data-size='1/2"'>1/2"</span>
+            <span class="chip" data-size='kalam'>kalam</span>
+          </div>
+        </div>
+
+        <div id="sizeBlockRoller" style="display: none">
+          <div class="section-title">Size</div>
+          <div class="chip-row" id="sizeRowRoller">
+            <span class="chip" data-size='9"'>9"</span>
+            <span class="chip" data-size='8"'>8"</span>
+            <span class="chip" data-size='6"'>6"</span>
+            <span class="chip" data-size='4"'>4"</span>
+            <span class="chip" data-size='2"'>2"</span>
+            <span class="chip" data-size='Designing'>Designing</span>
+            
+          </div>
+        </div>
+
+        <div id="materialBlockplumbing" style="display: none">
+          <div class="section-title">Material</div>
+          <div class="chip-row" id="materialRowplumbing">
+            <span class="chip" data-mat="PVC">PVC</span>
+            <span class="chip" data-mat="CPVC">CPVC</span>
+            <span class="chip" data-mat="Black">Black</span>
+            <span class="chip" data-mat="GI">GI</span>
+            <span class="chip" data-mat="Tank">Tank</span>
+            <span class="chip" data-mat="Pani Tape">pani Tape</span>
+            <span class="chip" data-mat="Cutting Blade">Cutting Blade</span>
+            <span class="chip" data-mat="J-hook">J-hook</span>
+            <span class="chip" data-mat="Concealed">Concealed</span>
+            <span class="chip" data-mat="Connection Pipe">Connection Pipe</span>
+            <span class="chip" data-mat="Passion ">Passion</span>
+            <span class="chip" data-mat="Comod">Comod</span>
+            <span class="chip" data-mat="Basin">Basin</span>
+            <span class="chip" data-mat="Pain Sheet">Pain Sheet</span>
+          </div>
+        </div>
+
+        <div id="sizeBlockCPVC" style="display: none">
+          <div class="section-title">Size</div>
+          <div class="chip-row" id="sizeRowCPVC">
+            <span class="chip" data-size='3/4"'>3/4"</span>
+            <span class="chip" data-size='1"'>1"</span>
+            <span class="chip" data-size='1.5"'>1.5"</span>
+          </div>
+        </div>
+
+        <div id="sizeBlockPVC" style="display: none">
+          <div class="section-title">Size</div>
+          <div class="chip-row" id="sizeRowPVC">
+            <span class="chip" data-size='1.5"'>1.5"</span>
+            <span class="chip" data-size='2.5"'>2.5"</span>
+            <span class="chip" data-size='4"'>4"</span>
+            <span class="chip" data-size='6"'>6"</span>
+          </div>
+        </div>
+
+        <div id="sizeBlockBlack" style="display: none">
+          <div class="section-title">Size</div>
+          <div class="chip-row" id="sizeRowBlack">
+            <span class="chip" data-size='3"'>3"</span>
+            <span class="chip" data-size='4"'>4"</span>
+            <span class="chip" data-size='6"'>6"</span>
+          </div>
+        </div>
+
+        <div id="sizeBlockPassion" style="display: none">
+          <div class="section-title">Size</div>
+          <div class="chip-row" id="sizeRowPassion">
+            <span class="chip" data-size="Wall Mixer">Wall Mixer</span>
+            <span class="chip" data-size="Bib-Cock">Bib-Cock</span>
+            <span class="chip" data-size="Angle-Cock">Angle-Cock</span>
+            <span class="chip" data-size="Swan Neck">Swan Neck</span>
+            <span class="chip" data-size="Long Body">Long Body</span>
+            <span class="chip" data-size="Piller Cock">Piller Cock</span>
+            <span class="chip" data-size="Non-Telephone">Non-Telephone</span>
+            <span class="chip" data-size="Gun">Gun</span>
+            <span class="chip" data-size="Shower">Shower</span>
+            <span class="chip" data-size="CV fringes">CV fringes</span>
+          </div>
+        </div>
+
+        <div id="sizeBlockGI" style="display: none">
+          <div class="section-title">Size</div>
+          <div class="chip-row" id="sizeRowGI">
+            <span class="chip" data-size='1/2"'>1/2"</span>
+            <span class="chip" data-size='3/4"'>3/4"</span>
+            <span class="chip" data-size='1"'>1"</span>
+            <span class="chip" data-size='1.5"'>1.5"</span>
+            <span class="chip" data-size='2"'>2"</span>
+            <span class="chip" data-size='M-seal'>M-seal</span>
+          </div>
+        </div>
+
+        <div id="sizeBlockTank" style="display: none">
+          <div class="section-title">Size</div>
+          <div class="chip-row" id="sizeRowTANK">
+            <span class="chip" data-size="200L">200L</span>
+            <span class="chip" data-size="500L">500L</span>
+            <span class="chip" data-size="750L">750L</span>
+            <span class="chip" data-size="1000L">1000L</span>
+          </div>
+        </div>
+
+        <div id="fittingBlockCPVC" style="display: none">
+          <div class="section-title">Fitting</div>
+          <div class="chip-row" id="fittingRowCPVC">
+            <span class="chip" data-fit="pipe">pipe</span>
+            <span class="chip" data-fit="Elbow">Elbow</span>
+            <span class="chip" data-fit="Tee">Tee</span>
+            <span class="chip" data-fit="Union">Union</span>
+            <span class="chip" data-fit="45°">45°</span>
+            <span class="chip" data-fit="Gate Valve">Gate Valve</span>
+            <span class="chip" data-fit="Coupler">Socket</span>
+            <span class="chip" data-fit="Reducer">Reducer</span>
+            <span class="chip" data-fit="End Cap">End Cap</span>
+            <span class="chip" data-fit="Female Socket">Female Socket</span>
+            <span class="chip" data-fit="Female Elbow">Female Elbow</span>
+            <span class="chip" data-fit="Female Tee">Female Tee</span>
+            <span class="chip" data-fit="Male Socket">Male Socket</span>
+            <span class="chip" data-fit="Long-Plug">Long Plug</span>
+            <span class="chip" data-fit="Reducer Elbow">Reducer Elbow</span>
+            <span class="chip" data-fit="Reducer Tee">Reducer Tee</span>
+            <span class="chip" data-fit="Over Bend">Over bend</span>
+            <span class="chip" data-fit="Cross Tee">Cross Tee</span>
+            <span class="chip" data-fit="Tank Nipple">Tank Nipple</span>
+            <span class="chip" data-fit="Mixer Adapter">Mixer Adapter</span>
+            <span class="chip" data-fit="Solvent">Solvent</span>
+          </div>
+        </div>
+
+        <div id="fittingBlockGI" style="display: none">
+          <div class="section-title">Fitting</div>
+          <div class="chip-row" id="fittingRowGI">
+            <span class="chip" data-fit="pipe">pipe</span>
+            <span class="chip" data-fit="Nipple">Nipple</span>
+            <span class="chip" data-fit="Elbow">Elbow</span>
+            <span class="chip" data-fit="Tee">Tee</span>
+            <span class="chip" data-fit="Union">Union</span>
+            <span class="chip" data-fit="45°">45°</span>
+            <span class="chip" data-fit="Gate Valve">Gate Valve</span>
+            <span class="chip" data-fit="Coupler">Socket</span>
+            <span class="chip" data-fit="Reducer">Reducer</span>
+            <span class="chip" data-fit="End Cap">End Cap</span>
+            <span class="chip" data-fit="Female Socket">Female Socket</span>
+            <span class="chip" data-fit="Female Elbow">Female Elbow</span>
+            <span class="chip" data-fit="Female Tee">Female Tee</span>
+            <span class="chip" data-fit="Male Socket">Male Socket</span>
+            <span class="chip" data-fit="Reducer Elbow">Reducer Elbow</span>
+            <span class="chip" data-fit="Reducer Tee">Reducer Tee</span>
+            <span class="chip" data-fit="Tank Nipple">Tank Nipple</span>
+          </div>
+        </div>
+
+        <div id="fittingBlockPVC" style="display: none">
+          <div class="section-title">Fitting</div>
+          <div class="chip-row" id="fittingRowPVC">
+            <span class="chip" data-fit="pipe">pipe</span>
+            <span class="chip" data-fit="Elbow">Elbow</span>
+            <span class="chip" data-fit="Tee">Tee</span>
+            <span class="chip" data-fit="45°">45°</span>
+            <span class="chip" data-fit="Socket">Socket</span>
+            <span class="chip" data-fit="Reducer">Reducer</span>
+            <span class="chip" data-fit="End Cap">End Cap</span>
+            <span class="chip" data-fit="P-Trap">P-Trap</span>
+            <span class="chip" data-fit="Trap">Trap</span>
+            <span class="chip" data-fit="Reducer Elbow">Reducer Elbow</span>
+            <span class="chip" data-fit="Reducer Tee">Reducer Tee</span>
+            <span class="chip" data-fit="Jali">Jali</span>
+            <span class="chip" data-fit="Door Elbow">Door Elbow</span>
+            <span class="chip" data-fit="Door Tee">Door Tee</span>
+            <span class="chip" data-fit="Solvent">Solvent</span>
+          </div>
+        </div>
+
+        <div id="fittingBlockBlack" style="display: none">
+          <div class="section-title">Fitting</div>
+          <div class="chip-row" id="fittingRowBlack">
+            <span class="chip" data-fit="pipe">pipe</span>
+            <span class="chip" data-fit="Elbow">Elbow</span>
+            <span class="chip" data-fit="Tee">Tee</span>
+            <span class="chip" data-fit="Socket">Socket</span>
+            <span class="chip" data-fit="Jali">Jali</span>
+            <span class="chip" data-fit="Pain Sheet">pain Sheet</span>
+            <span class="chip" data-fit="Solvent">Solvent</span>
+          </div>
+        </div>
+
+        <div id="materialBlockwiring" style="display: none">
+          <div class="section-title">Material</div>
+          <div class="chip-row" id="materialRowwiring">
+            <span class="chip" data-mat="Wire">Wire</span>
+            <span class="chip" data-mat="Switch board">Switch board</span>
+            <span class="chip" data-mat="Single">Single</span>
+            <span class="chip" data-mat="Modular">Modular</span>
+            <span class="chip" data-mat="Box">Box</span>
+            <span class="chip" data-mat="MCB">MCB</span>
+            <span class="chip" data-mat="MCB-Box">MCB-Box</span>
+            <span class="chip" data-mat="Pipe">Pipe</span>
+            <span class="chip" data-mat="Screw">Screw</span>
+            <span class="chip" data-mat="Fiber-plate">Fiber-plate</span>
+            <span class="chip" data-mat="Wire Beet">Wire Beet</span>
+            <span class="chip" data-mat="Cutting Blade">Cutting Blade</span>
+            <span class="chip" data-mat="J-hook">J-hook</span>
+            <span class="chip" data-mat="Tape">Tape</span>
+            <span class="chip" data-mat="GI-Wire">GI-wire</span>
+          </div>
+        </div>
+
+        <div id="sizeBlockWIRE" style="display: none">
+          <div class="section-title">Size</div>
+          <div class="chip-row" id="sizeRowWIRE">
+            <span class="chip" data-size="Rathi Gold">Rathi Gold</span>
+            <span class="chip" data-size="Rathi RC">Rathi RC</span>
+            <span class="chip" data-size="Copper">copper</span>
+            <span class="chip" data-size="meter_wire">meter_wire</span>
+          </div>
+        </div>
+
+        <div id="sizeBlockSWITCHBOARD" style="display: none">
+          <div class="section-title">Size</div>
+          <div class="chip-row" id="sizeRowBOARD">
+            <span class="chip" data-size="Gold">Gold</span>
+            <span class="chip" data-size="Platinium">Platinium</span>
+            <span class="chip" data-size="MG-Gold">MG-Gold</span>
+            <span class="chip" data-size="Heavy">Heavy</span>
+          </div>
+        </div>
+
+        <div id="sizeBlockMODULAR" style="display: none">
+          <div class="section-title">Size</div>
+          <div class="chip-row" id="sizeRowMODULAR">
+            <span class="chip" data-size="6A">6A</span>
+            <span class="chip" data-size="16A">16A</span>
+            <span class="chip" data-size="20A">20A</span>
+            <span class="chip" data-size="32A">32A</span>
+            <span class="chip" data-size="3X3 plate">3X3 plate</span>
+            <span class="chip" data-size="4X3 plate">4X3 plate</span>
+            <span class="chip" data-size="5X3 plate">5X3 plate</span>
+            <span class="chip" data-size="7X3 plate">7X3 plate</span>
+            <span class="chip" data-size="8X4 plate">8X4 plate</span>
+            <span class="chip" data-size="5X5 plate">5X5 plate</span>
+          </div>
+        </div>
+
+        <div id="sizeBlockBOX" style="display: none">
+          <div class="section-title">Size</div>
+          <div class="chip-row" id="sizeRowBOX">
+            <span class="chip" data-size="3X3 Mounting">3X3 Mounting</span>
+            <span class="chip" data-size="3X5 Mounting">3X5 Mounting</span>
+            <span class="chip" data-size="3X3 SurFace">3X3 Surface</span>
+            <span class="chip" data-size="3X5 Surface">3X5 Surface</span>
+            <span class="chip" data-size="PVC 4X4">PVC 4X4</span>
+            <span class="chip" data-size="Plate 4X4">Plate 4X4</span>
+            <span class="chip" data-size="PVC 7X4">PVC 7X4</span>
+            <span class="chip" data-size="Plate 12X8">Plate 12X8</span>
+            <span class="chip" data-size="PVC 4X4">PVC 4X4</span>
+            <span class="chip" data-size="Plate 4X4">Plate 4X4</span>
+          </div>
+        </div>
+
+        <div id="sizeBlockMCB" style="display: none">
+          <div class="section-title">Size</div>
+          <div class="chip-row" id="sizeRowMCB">
+            <span class="chip" data-size="SP">SP</span>
+            <span class="chip" data-size="DP">DP</span>
+          </div>
+        </div>
+
+        <div id="sizeBlockMCB-BOX" style="display: none">
+          <div class="section-title">Size</div>
+          <div class="chip-row" id="sizeRowMCB-BOX">
+            <span class="chip" data-size="2-Way">2-Way</span>
+            <span class="chip" data-size="6-Way">6-Way</span>
+            <span class="chip" data-size="8-Way">8-Way</span>
+            <span class="chip" data-size="10-Way">10-Way</span>
+            <span class="chip" data-size="12-Way">12-Way</span>
+            <span class="chip" data-size="14-Way">14-Way</span>
+            <span class="chip" data-size="16-Way">16-Way</span>
+            <span class="chip" data-size="20-Way TPN">20-Way TPN</span>
+          </div>
+        </div>
+
+        <div id="sizeBlockPIPE" style="display: none">
+          <div class="section-title">Size</div>
+          <div class="chip-row" id="sizeRowPIPE">
+            <span class="chip" data-size="Black 16mm">Black 16mm</span>
+            <span class="chip" data-size="Black 20mm">Black 20mm</span>
+            <span class="chip" data-size="Black NS 16mm">Black NS 16mm</span>
+            <span class="chip" data-size="Black NS 20mm">Black NS 20mm</span>
+            <span class="chip" data-size="White NS 20mm">white NS 20mm</span>
+            <span class="chip" data-size="White NS 16mm">White NS 16mm</span>
+          </div>
+        </div>
+
+        <div id="sizeBlockWIRE-BEET" style="display: none">
+          <div class="section-title">Size</div>
+          <div class="chip-row" id="sizeRowWIRE-BEET">
+            <span class="chip" data-size="16mm">16mm</span>
+            <span class="chip" data-size="20mm">20mm</span>
+            <span class="chip" data-size="25mm">25mm</span>
+            <span class="chip" data-size="30mm">30mm</span>
+            <span class="chip" data-size="35mm">35MM</span>
+          </div>
+        </div>
+        <div id="sizeBlockSCREW" style="display: none">
+          <div class="section-title">Size</div>
+          <div class="chip-row" id="sizeRowSCREW">
+            <span class="chip" data-size='3/4"'>3/4"</span>
+            <span class="chip" data-size='1"'>1"</span>
+            <span class="chip" data-size='1.5"'>1.5"</span>
+            <span class="chip" data-size='2"'>2"</span>
+            <span class="chip" data-size='2.5"'>2.5"</span>
+            <span class="chip" data-size='3"'>3"</span>
+            <span class="chip" data-size='4"'>4"</span>
+            <span class="chip" data-size='6"'>6"</span>
+          </div>
+        </div>
+
+        <div id="sizeBlockSINGLE" style="display: none">
+          <div class="section-title">Size</div>
+          <div class="chip-row" id="sizeRowSINGLE">
+            <span class="chip" data-size="Switch">Switch</span>
+            <span class="chip" data-size="5-Pin Socket">5-Pin Socket</span>
+            <span class="chip" data-size="2-pin Socket">2-pin Socket</span>
+            <span class="chip" data-size="Indicator">Indicator</span>
+            <span class="chip" data-size="Fuse">Fuse</span>
+            <span class="chip" data-size="Regulator">Regulator</span>
+          </div>
+        </div>
+        <div id="sizeBlockFIBER-PLATE" style="display: none">
+          <div class="section-title">Size</div>
+          <div class="chip-row" id="sizeRowFIBER-PLATE">
+            <span class="chip" data-size="4x4">4x4</span>
+            <span class="chip" data-size="5x5">5x5</span>
+            <span class="chip" data-size="7x4">7xA</span>
+            <span class="chip" data-size="7X5">7X5</span>
+            <span class="chip" data-size="12X8">12X8</span>
+          </div>
+        </div>
+
+        <div id="fittingBlockWIRE" style="display: none">
+          <div class="section-title">Fitting</div>
+          <div class="chip-row" id="fittingRowWIRE">
+            <span class="chip" data-fit='0.75"'>O.75"</span>
+            <span class="chip" data-fit='1"'>1"</span>
+            <span class="chip" data-fit='1.5"'>1.5"</span>
+            <span class="chip" data-fit='2.5"'>2.5"</span>
+            <span class="chip" data-fit='4"'>4"</span>
+            <span class="chip" data-fit='6"'>6"</span>
+            <span class="chip" data-fit='10"'>10"</span>
+          </div>
+        </div>
+
+        <div id="fittingBlockSWITCHBOARD" style="display: none">
+          <div class="section-title">Fitting</div>
+          <div class="chip-row" id="fittingRowSWITCHBOARD">
+            <span class="chip" data-fit="5x3 4-Gang">5X3 4-Gang</span>
+            <span class="chip" data-fit="5x3 6-Gang">5X3 6-Gang</span>
+            <span class="chip" data-fit="5x3 8-Gang">5X3 8-Gang</span>
+            <span class="chip" data-fit="5x3 10-Gang">5X3 10-Gang</span>
+            <span class="chip" data-fit="3x3 4-Gang">3X3 4-Gang</span>
+            <span class="chip" data-fit="3x3 3-Gang">3X3 3-Gang</span>
+            <span class="chip" data-fit="3x3 2-Gang">3X3 2-Gang</span>
+            <span class="chip" data-fit="3x3 1-Gang">3X3 1-Gang</span>
+            <span class="chip" data-fit="3x3 Power-Socket"
+              >3X3 Power-Socket</span
+            >
+            <span class="chip" data-fit="3x5 Double Power-Socket"
+              >3X5 Double Power-Socket</span
+            >
+            <span class="chip" data-fit="3X3 Main Switch">3X3 main Switch</span>
+            <span class="chip" data-fit="3X5 Main Switch">3X5 main Switch</span>
+          </div>
+        </div>
+
+        <div id="fittingBlockMODULAR" style="display: none">
+          <div class="section-title">Fitting</div>
+          <div class="chip-row" id="fittingRowMODULAR">
+            <span class="chip" data-fit="Switch">Switch</span>
+            <span class="chip" data-fit="Indicator">Indicator</span>
+            <span class="chip" data-fit="5-Pin">5-pin</span>
+            <span class="chip" data-fit="2-Pin">2-Pin</span>
+            <span class="chip" data-fit="Fan Regulator">Fan Regulator</span>
+          </div>
+        </div>
+
+        <div id="fittingBlockMCB" style="display: none">
+          <div class="section-title">Fitting</div>
+          <div class="chip-row" id="fittingRowMCB">
+            <span class="chip" data-fit="6A">6A</span>
+            <span class="chip" data-fit="10A">10A</span>
+            <span class="chip" data-fit="16A">16A</span>
+            <span class="chip" data-fit="20A">20A</span>
+            <span class="chip" data-fit="32A">32A</span>
+            <span class="chip" data-fit="40A">40A</span>
+          </div>
+        </div>
+      </div>
+      </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <script src="script.js" defer></script>
+  </body>
+</html>
