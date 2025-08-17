@@ -38,9 +38,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // -------------------------
-    // Logic for the edit_bill.html page - FIXED
-    // -------------------------
-    if (window.location.pathname.endsWith("edit_bill.html")) {
+// Fixed edit_bill.html logic for your server setup
+if (window.location.pathname.endsWith("edit_bill.html")) {
     const billList = document.getElementById("billList");
 
     // Fetch bills for the logged-in user
@@ -49,114 +48,154 @@ document.addEventListener("DOMContentLoaded", () => {
         credentials: "include"
     })
     .then(response => {
-        // DEBUG: Log the raw response status from the server
         console.log("Response Status from /api/get-bills:", response.status);
         if (!response.ok) {
             if (response.status === 401) {
                 billList.innerHTML = "<li>Please log in to view your bills.</li>";
+                return Promise.reject(new Error('Unauthorized'));
             }
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         return response.json();
     })
     .then(billRecords => {
-        // DEBUG: Log the actual data received from the backend
         console.log("Received data from backend:", billRecords);
         
         if (!billRecords || billRecords.length === 0) {
             billList.innerHTML = "<li>No bills found for this user.</li>";
-        } else {
-            billList.innerHTML = ""; // Clear list before adding
-            billRecords.forEach(record => {
-                // DEBUG: Log each record as we process it
-                console.log("Processing record:", record); 
-                let bill;
-                try {
-                    // This is a likely point of failure. Let's see the data before parsing.
-                    console.log("Attempting to parse record.billData:", record.billData);
-                    bill = JSON.parse(record.billData);
-                    console.log("Successfully parsed billData:", bill); 
-                } catch (e) {
-                    console.error('Error parsing bill data:', e, "Raw data was:", record.billData);
-                    bill = {
-                        estimateNo: record.estimateNo || 'Unknown',
-                        customerName: record.customerName || 'Unknown Customer'
-                    };
-                }
-
-                const li = document.createElement("li");
-                li.innerHTML = `
-                    Bill No: <span class="bill-no">${bill.estimateNo}</span> - Customer: ${bill.customerName}
-                    <div class="bill-actions">
-                        <button class="edit-btn">Edit</button>
-                        <button class="delete-btn">Delete</button>
-                    </div>
-                `;
-                li.classList.add("bill-item");
-                li.dataset.bill = JSON.stringify(bill);
-                billList.appendChild(li);
-            });
+            return;
         }
-    })
-    .catch(error => {
-        console.error("Error fetching bills:", error);
-        billList.innerHTML = "<li>Error loading bills. Please check your network and try again.</li>";
-    });
 
-        // Bill action buttons - ENHANCED DELETE FUNCTIONALITY
-        billList.addEventListener("click", async (e) => {
-            const clickedItem = e.target.closest(".bill-item");
-            if (!clickedItem) return;
-
-            document.querySelectorAll(".bill-item").forEach(item => {
-                if (item !== clickedItem) {
-                    item.classList.remove("active");
-                }
-            });
-
-            clickedItem.classList.toggle("active");
-
-            if (e.target.classList.contains("edit-btn")) {
-                const billToEdit = JSON.parse(clickedItem.dataset.bill);
-                localStorage.setItem("billToEdit", JSON.stringify(billToEdit));
-                window.location.href = "make_bill.html";
-            } else if (e.target.classList.contains("delete-btn")) {
-                const billToDelete = JSON.parse(clickedItem.dataset.bill);
-                const billNo = clickedItem.querySelector('.bill-no').textContent;
+        billList.innerHTML = ""; // Clear list before adding
+        
+        billRecords.forEach(record => {
+            console.log("Processing record:", record);
+            
+            let bill;
+            
+            try {
+                // Your server provides billData as a JSON string
+                console.log("Attempting to parse record.billData:", record.billData);
+                bill = JSON.parse(record.billData);
+                console.log("Successfully parsed billData:", bill);
+            } catch (e) {
+                console.error('Error parsing bill data:', e, "Raw data was:", record.billData);
+                // Fallback: create bill object from database fields
+                bill = {
+                    estimateNo: record.estimate_no || 'Unknown',
+                    customerName: record.customer_name || 'Unknown Customer',
+                    customerPhone: record.customer_phone || '',
+                    billDate: record.bill_date || 'Unknown Date',
+                    items: [],
+                    subTotal: parseFloat(record.sub_total || 0),
+                    discount: parseFloat(record.discount || 0),
+                    grandTotal: parseFloat(record.grand_total || 0),
+                    received: parseFloat(record.received || 0),
+                    balance: parseFloat(record.balance || 0),
+                    amountWords: record.amount_words || ''
+                };
                 
-                if (confirm(`Are you sure you want to delete bill ${billNo}?`)) {
+                // Try to parse items if available
+                if (record.items) {
                     try {
-                        const response = await fetch(`${BASE_URL}/api/delete-bill`, {
-                            method: 'DELETE',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            credentials: 'include',
-                            body: JSON.stringify({ estimateNo: billToDelete.estimateNo })
-                        });
-
-                        const result = await response.json();
-                        
-                        if (response.ok && result.success) {
-                            clickedItem.remove();
-                            alert('Bill deleted successfully');
-                            
-                            // Check if no bills left
-                            if (billList.children.length === 0) {
-                                billList.innerHTML = "<li>No bills found for this user.</li>";
-                            }
-                        } else {
-                            alert(result.message || 'Failed to delete bill');
-                        }
-                    } catch (error) {
-                        console.error('Error deleting bill:', error);
-                        alert('Error deleting bill. Please try again.');
+                        bill.items = typeof record.items === 'string' ? JSON.parse(record.items) : record.items;
+                    } catch (itemsError) {
+                        console.error('Error parsing items:', itemsError);
+                        bill.items = [];
                     }
                 }
             }
+
+            const li = document.createElement("li");
+            li.innerHTML = `
+                Bill No: <span class="bill-no">${bill.estimateNo || 'N/A'}</span> - Customer: ${bill.customerName || 'Unknown'}
+                <br><small>Date: ${bill.billDate || 'N/A'} | Total: ₹${bill.grandTotal || '0.00'}</small>
+                <div class="bill-actions">
+                    <button class="edit-btn">Edit</button>
+                    <button class="delete-btn">Delete</button>
+                </div>
+            `;
+            li.classList.add("bill-item");
+            li.dataset.bill = JSON.stringify(bill);
+            billList.appendChild(li);
         });
-        return;
-    }
+    })
+    .catch(error => {
+        console.error("Error fetching bills:", error);
+        if (error.message !== 'Unauthorized') {
+            billList.innerHTML = "<li>Error loading bills. Please check your network and try again.</li>";
+        }
+    });
+
+    // Enhanced Bill action buttons
+    billList.addEventListener("click", async (e) => {
+        const clickedItem = e.target.closest(".bill-item");
+        if (!clickedItem) return;
+
+        // Remove active class from other items
+        document.querySelectorAll(".bill-item").forEach(item => {
+            if (item !== clickedItem) {
+                item.classList.remove("active");
+            }
+        });
+
+        clickedItem.classList.toggle("active");
+
+        if (e.target.classList.contains("edit-btn")) {
+            const billToEdit = JSON.parse(clickedItem.dataset.bill);
+            console.log("Editing bill:", billToEdit);
+            
+            // Store the bill data for editing
+            localStorage.setItem("billToEdit", JSON.stringify(billToEdit));
+            window.location.href = "make_bill.html";
+            
+        } else if (e.target.classList.contains("delete-btn")) {
+            const billToDelete = JSON.parse(clickedItem.dataset.bill);
+            const billNo = clickedItem.querySelector('.bill-no').textContent;
+            
+            if (confirm(`Are you sure you want to delete bill ${billNo}?`)) {
+                try {
+                    // Use the bill's estimate number for deletion
+                    const deletePayload = { 
+                        estimateNo: billToDelete.estimateNo
+                    };
+                    
+                    console.log("Deleting bill with payload:", deletePayload);
+                    
+                    const response = await fetch(`${BASE_URL}/api/delete-bill`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        credentials: 'include',
+                        body: JSON.stringify(deletePayload)
+                    });
+
+                    console.log("Delete response status:", response.status);
+                    const result = await response.json();
+                    console.log("Delete response data:", result);
+                    
+                    if (response.ok && result.success) {
+                        clickedItem.remove();
+                        alert('Bill deleted successfully');
+                        
+                        // Check if no bills left
+                        if (billList.children.length === 0) {
+                            billList.innerHTML = "<li>No bills found for this user.</li>";
+                        }
+                    } else {
+                        console.error("Delete failed:", result);
+                        alert(result.message || 'Failed to delete bill');
+                    }
+                } catch (error) {
+                    console.error('Error deleting bill:', error);
+                    alert('Error deleting bill. Please try again.');
+                }
+            }
+        }
+    });
+    return;
+}
 
     // ---------- ELEMENTS FOR make_bill.html ----------
     const billTable = document.getElementById("billTable");
@@ -284,29 +323,31 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // --- `saveAndDownloadBill` FUNCTION & HELPER ---
     function getBillData() {
-        const tableData = [];
-        tbody.querySelectorAll("tr").forEach(tr => {
-            const product = tr.querySelector(".product").value || "";
-            const unit = tr.querySelector(".unit").value || "";
-            const qty = parseFloat(tr.querySelector(".qty").value || 0);
-            const price = parseFloat(tr.querySelector(".price").value || 0);
-            const rowTotal = qty * price;
-            tableData.push({ product, unit, qty, price, rowTotal });
-        });
-        return {
-            estimateNo: estimateNoEl.value,
-            customerName: customerNameEl.value,
-            customerPhone: customerPhoneEl.value,
-            billDate: billDateEl.value,
-            items: tableData,
-            subTotal: parseFloat(subTotalEl.value),
-            discount: parseFloat(discountEl.value),
-            grandTotal: parseFloat(grandTotalEl.value),
-            received: parseFloat(receivedEl.value),
-            balance: parseFloat(balanceEl.value),
-            amountWords: amountWordsEl ? amountWordsEl.value : ""
-        };
-    }
+    const tableData = [];
+    tbody.querySelectorAll("tr").forEach(tr => {
+        const product = tr.querySelector(".product").value || "";
+        const unit = tr.querySelector(".unit").value || "";
+        const qty = parseFloat(tr.querySelector(".qty").value || 0);
+        const price = parseFloat(tr.querySelector(".price").value || 0);
+        const rowTotal = qty * price;
+        tableData.push({ product, unit, qty, price, rowTotal });
+    });
+    
+    return {
+        // Keep using frontend field names - your server expects these
+        estimateNo: estimateNoEl.value,
+        customerName: customerNameEl.value,
+        customerPhone: customerPhoneEl.value,
+        billDate: billDateEl.value,
+        items: tableData,
+        subTotal: parseFloat(subTotalEl.value),
+        discount: parseFloat(discountEl.value),
+        grandTotal: parseFloat(grandTotalEl.value),
+        received: parseFloat(receivedEl.value),
+        balance: parseFloat(balanceEl.value),
+        amountWords: amountWordsEl ? amountWordsEl.value : ""
+    };
+}
 
     // ------------- saveAndDownloadBill (fixed) -------------
     async function saveAndDownloadBill() {
