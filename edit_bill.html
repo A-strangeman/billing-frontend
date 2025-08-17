@@ -35,25 +35,23 @@
     </main>
   </div>
 
-  <script>
+<script>
     const BASE_URL = "https://billing-backend-j0ui.onrender.com";
     
     // Wait for DOM to be fully loaded
     document.addEventListener("DOMContentLoaded", function() {
-        console.log("🚀 DOM Loaded - Starting Edit Bills Debug");
+        console.log("🚀 DOM Loaded - Edit Bills Page");
         
         // Add logout functionality
         const logoutBtn = document.getElementById("logoutBtn");
         if (logoutBtn) {
             logoutBtn.addEventListener("click", async () => {
                 try {
-                    const response = await fetch(`${BASE_URL}/api/logout`, {
+                    await fetch(`${BASE_URL}/api/logout`, {
                         method: 'POST',
                         credentials: 'include'
                     });
-                    if (response.ok) {
-                        window.location.href = 'index.html';
-                    }
+                    window.location.href = 'index.html';
                 } catch (error) {
                     console.error('Logout error:', error);
                     window.location.href = 'index.html';
@@ -61,305 +59,150 @@
             });
         }
         
+        // Initialize edit bills functionality
         initializeEditBills();
     });
 
     function initializeEditBills() {
-        console.log("🔧 Initializing Edit Bills functionality");
+        console.log("🔧 Initializing Edit Bills");
         
         const billList = document.getElementById("billList");
-        
-        // Verify element exists
         if (!billList) {
-            console.error("❌ ERROR: billList element not found!");
+            console.error("❌ billList element not found!");
             return;
         }
         
-        console.log("✅ billList element found:", billList);
+        // Load bills from server
+        loadBills();
+    }
+
+    function loadBills() {
+        console.log("📡 Loading bills...");
         
-        // Test server connection first
-        console.log("🔗 Testing server connection...");
-        fetch(`${BASE_URL}/api/health`, {
+        const billList = document.getElementById("billList");
+        billList.innerHTML = "<li>Loading bills...</li>";
+        
+        fetch(`${BASE_URL}/api/get-bills`, {
             method: "GET",
             credentials: "include"
         })
         .then(response => {
-            console.log("❤️ Health check response:", response.status);
-            return response.json();
-        })
-        .then(data => {
-            console.log("❤️ Health check data:", data);
-            loadBills();
-        })
-        .catch(error => {
-            console.error("❌ Server connection failed:", error);
-            billList.innerHTML = `<li style='color: red;'>❌ Cannot connect to server: ${error.message}</li>`;
-        });
-    }
-
-    function loadBills() {
-        console.log("📡 Loading bills from server...");
-        
-        const billList = document.getElementById("billList");
-        billList.innerHTML = "<li>🔄 Loading bills...</li>";
-        
-        fetch(`${BASE_URL}/api/get-bills`, {
-            method: "GET",
-            credentials: "include",
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            }
-        })
-        .then(response => {
-            console.log("📥 GET /api/get-bills Response:");
-            console.log("   Status:", response.status);
-            console.log("   Status Text:", response.statusText);
-            console.log("   OK:", response.ok);
-            console.log("   Headers:", Object.fromEntries([...response.headers.entries()]));
+            console.log("📥 Response:", response.status);
             
             if (!response.ok) {
                 if (response.status === 401) {
-                    console.log("🚫 Not authenticated - redirecting to login");
-                    billList.innerHTML = "<li style='color: red;'>🔐 Please log in first. <a href='index.html'>Go to Login</a></li>";
-                    return Promise.reject(new Error('Not authenticated'));
-                } else if (response.status === 404) {
-                    console.log("📭 Endpoint not found");
-                    billList.innerHTML = "<li style='color: red;'>❌ API endpoint not found (404)</li>";
-                    return Promise.reject(new Error('Endpoint not found'));
-                } else {
-                    console.error("❌ HTTP Error:", response.status);
-                    billList.innerHTML = `<li style='color: red;'>❌ Server error (${response.status})</li>`;
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    billList.innerHTML = "<li style='color: red;'>Please log in first. <a href='index.html'>Login</a></li>";
+                    throw new Error('Not authenticated');
                 }
+                throw new Error(`HTTP ${response.status}`);
             }
             
             return response.json();
         })
         .then(billRecords => {
-            console.log("📊 Bills data received:");
-            console.log("   Type:", typeof billRecords);
-            console.log("   Is Array:", Array.isArray(billRecords));
-            console.log("   Length:", billRecords?.length);
-            console.log("   First record sample:", billRecords?.[0]);
-            console.log("   Full data:", billRecords);
+            console.log("📊 Bills received:", billRecords?.length, "bills");
             
-            if (!billRecords) {
-                console.error("❌ No data received");
-                billList.innerHTML = "<li style='color: red;'>❌ No data received from server</li>";
+            if (!Array.isArray(billRecords) || billRecords.length === 0) {
+                billList.innerHTML = "<li style='color: blue;'>No bills found. <a href='make_bill.html'>Create one</a></li>";
                 return;
             }
             
-            if (!Array.isArray(billRecords)) {
-                console.error("❌ Data is not an array:", billRecords);
-                billList.innerHTML = "<li style='color: red;'>❌ Invalid data format received</li>";
-                return;
-            }
-            
-            if (billRecords.length === 0) {
-                console.log("📝 No bills found");
-                billList.innerHTML = "<li style='color: blue;'>📝 No bills found. <a href='make_bill.html'>Create your first bill</a></li>";
-                return;
-            }
-            
-            console.log(`✅ Processing ${billRecords.length} bills`);
             displayBills(billRecords);
-            
         })
         .catch(error => {
-            console.error("💥 Error loading bills:");
-            console.error("   Error type:", error.constructor.name);
-            console.error("   Error message:", error.message);
-            console.error("   Error stack:", error.stack);
-            
-            if (error.message !== 'Not authenticated') {
-                billList.innerHTML = `
-                    <li style='color: red; padding: 10px;'>
-                        ❌ <strong>Error loading bills:</strong><br>
-                        ${error.message}<br>
-                        <small>Check browser console for details</small>
-                        <br><button onclick="loadBills()" style="margin-top:5px;">🔄 Retry</button>
-                    </li>
-                `;
-            }
+            console.error("💥 Error:", error);
+            billList.innerHTML = `<li style='color: red;'>Error: ${error.message} <button onclick="loadBills()">Retry</button></li>`;
         });
     }
 
     function displayBills(billRecords) {
-        console.log("🖼️ Displaying bills in UI");
-        
         const billList = document.getElementById("billList");
         billList.innerHTML = "";
         
-        billRecords.forEach((record, index) => {
-            console.log(`\n🔍 Processing bill ${index + 1}:`, record);
-            
+        billRecords.forEach(record => {
             let bill;
-            let parseMethod;
             
-            // Try to parse billData field first (your server provides this)
-            if (record.billData) {
-                try {
-                    console.log(`   📋 Parsing billData for bill ${index + 1}:`, record.billData);
-                    bill = JSON.parse(record.billData);
-                    parseMethod = "billData";
-                    console.log(`   ✅ Successfully parsed billData:`, bill);
-                } catch (e) {
-                    console.error(`   ❌ Failed to parse billData:`, e);
-                    bill = null;
-                }
-            }
-            
-            // Fallback: construct from database fields
-            if (!bill) {
-                console.log(`   🔧 Building bill from database fields for bill ${index + 1}`);
+            // Parse billData from your server
+            try {
+                bill = JSON.parse(record.billData);
+            } catch (e) {
+                // Fallback: construct from database fields
                 bill = {
                     estimateNo: record.estimate_no || 'Unknown',
-                    customerName: record.customer_name || 'Unknown Customer',
+                    customerName: record.customer_name || 'Unknown',
                     customerPhone: record.customer_phone || '',
                     billDate: record.bill_date || '',
-                    subTotal: parseFloat(record.sub_total || 0),
-                    discount: parseFloat(record.discount || 0),
-                    grandTotal: parseFloat(record.grand_total || 0),
-                    received: parseFloat(record.received || 0),
-                    balance: parseFloat(record.balance || 0),
-                    amountWords: record.amount_words || '',
+                    grandTotal: record.grand_total || 0,
                     items: []
                 };
-                
-                // Parse items if available
-                if (record.items) {
-                    try {
-                        bill.items = typeof record.items === 'string' ? JSON.parse(record.items) : record.items;
-                    } catch (e) {
-                        console.error(`   ❌ Error parsing items for bill ${index + 1}:`, e);
-                        bill.items = [];
-                    }
-                }
-                
-                parseMethod = "database-fields";
-                console.log(`   ✅ Built bill from database fields:`, bill);
             }
             
-            // Create and add bill item to DOM
             const li = document.createElement("li");
             li.className = "bill-item";
-            li.style.cssText = "border: 1px solid #ddd; margin: 10px 0; padding: 15px; border-radius: 5px; background: #f9f9f9;";
-            
             li.innerHTML = `
-                <div>
-                    <h3 style="margin: 0 0 10px 0; color: #333;">
-                        🧾 Bill #<span class="bill-no">${bill.estimateNo}</span>
-                    </h3>
-                    <div style="margin-bottom: 10px;">
-                        <strong>👤 Customer:</strong> ${bill.customerName}<br>
-                        <strong>📞 Phone:</strong> ${bill.customerPhone || 'N/A'}<br>
-                        <strong>📅 Date:</strong> ${bill.billDate || 'N/A'}<br>
-                        <strong>💰 Total:</strong> ₹${bill.grandTotal || '0.00'}<br>
-                        <strong>📊 Items:</strong> ${bill.items?.length || 0}
+                <div style="border: 1px solid #ddd; padding: 10px; margin: 5px 0;">
+                    <strong>Bill #<span class="bill-no">${bill.estimateNo}</span></strong><br>
+                    Customer: ${bill.customerName}<br>
+                    Date: ${bill.billDate}<br>
+                    Total: ₹${bill.grandTotal}
+                    <div style="margin-top: 10px;">
+                        <button class="edit-btn" style="background: #28a745; color: white; padding: 5px 10px; margin-right: 5px; border: none;">Edit</button>
+                        <button class="delete-btn" style="background: #dc3545; color: white; padding: 5px 10px; border: none;">Delete</button>
                     </div>
-                    <div class="bill-actions">
-                        <button class="edit-btn" style="background: #28a745; color: white; padding: 8px 15px; margin-right: 10px; border: none; border-radius: 3px; cursor: pointer;">
-                            ✏️ Edit
-                        </button>
-                        <button class="delete-btn" style="background: #dc3545; color: white; padding: 8px 15px; border: none; border-radius: 3px; cursor: pointer;">
-                            🗑️ Delete
-                        </button>
-                    </div>
-                    <small style="color: #666; font-size: 11px;">
-                        Parse method: ${parseMethod} | Record ID: ${record.id}
-                    </small>
                 </div>
             `;
-            
             li.dataset.bill = JSON.stringify(bill);
-            li.dataset.recordId = record.id;
-            
             billList.appendChild(li);
-            console.log(`   ✅ Added bill ${index + 1} to DOM`);
         });
         
-        console.log("🎉 All bills displayed successfully!");
-        
-        // Add event listeners for buttons
         setupBillActions();
     }
 
     function setupBillActions() {
-        console.log("🖱️ Setting up bill action buttons");
-        
         const billList = document.getElementById("billList");
         
         billList.addEventListener("click", async (e) => {
-            const clickedBtn = e.target;
-            const billItem = clickedBtn.closest(".bill-item");
-            
+            const billItem = e.target.closest(".bill-item");
             if (!billItem) return;
             
-            console.log("🖱️ Button clicked:", clickedBtn.className);
-            
-            if (clickedBtn.classList.contains("edit-btn")) {
-                console.log("✏️ Edit button clicked");
-                
+            if (e.target.classList.contains("edit-btn")) {
                 const billData = JSON.parse(billItem.dataset.bill);
-                console.log("   Bill to edit:", billData);
-                
-                // Store in localStorage for the edit page
                 localStorage.setItem("billToEdit", JSON.stringify(billData));
-                console.log("   ✅ Stored bill in localStorage");
-                
-                // Redirect to edit page
                 window.location.href = "make_bill.html";
                 
-            } else if (clickedBtn.classList.contains("delete-btn")) {
-                console.log("🗑️ Delete button clicked");
-                
+            } else if (e.target.classList.contains("delete-btn")) {
                 const billData = JSON.parse(billItem.dataset.bill);
-                const billNo = billData.estimateNo;
                 
-                console.log("   Bill to delete:", billData);
-                
-                if (confirm(`❌ Are you sure you want to delete bill #${billNo}?\n\nCustomer: ${billData.customerName}\nTotal: ₹${billData.grandTotal}`)) {
+                if (confirm(`Delete bill #${billData.estimateNo}?`)) {
                     try {
-                        console.log("   🗑️ Sending delete request...");
-                        
                         const response = await fetch(`${BASE_URL}/api/delete-bill`, {
                             method: 'DELETE',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
+                            headers: { 'Content-Type': 'application/json' },
                             credentials: 'include',
                             body: JSON.stringify({ estimateNo: billData.estimateNo })
                         });
                         
-                        console.log("   Delete response status:", response.status);
                         const result = await response.json();
-                        console.log("   Delete response data:", result);
                         
                         if (response.ok && result.success) {
-                            console.log("   ✅ Bill deleted successfully");
                             billItem.remove();
-                            alert(`✅ Bill #${billNo} deleted successfully`);
+                            alert('Bill deleted successfully');
                             
-                            // Check if no bills left
-                            const remainingBills = document.querySelectorAll(".bill-item");
-                            if (remainingBills.length === 0) {
-                                billList.innerHTML = "<li style='color: blue;'>📝 No bills found. <a href='make_bill.html'>Create your first bill</a></li>";
+                            if (billList.children.length === 0) {
+                                billList.innerHTML = "<li>No bills found.</li>";
                             }
                         } else {
-                            console.error("   ❌ Delete failed:", result);
-                            alert(`❌ Failed to delete bill: ${result.message || 'Unknown error'}`);
+                            alert('Failed to delete: ' + (result.message || 'Unknown error'));
                         }
                     } catch (error) {
-                        console.error('   💥 Delete request failed:', error);
-                        alert(`❌ Error deleting bill: ${error.message}`);
+                        alert('Delete error: ' + error.message);
                     }
                 }
             }
         });
     }
 
-    // Global function to retry loading (called by retry button)
+    // Make loadBills global for retry button
     window.loadBills = loadBills;
   </script>
 </body>
